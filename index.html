@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Click Builder</title>
+  <style>
+    :root {
+      --bg: #0e1726;
+      --panel: #162235;
+      --accent: #7c3aed;
+      --accent-2: #22c55e;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(124, 58, 237, 0.12), transparent 30%),
+                  radial-gradient(circle at 80% 0%, rgba(34, 197, 94, 0.12), transparent 35%),
+                  var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      width: min(460px, 100%);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      border-radius: 18px;
+      padding: 24px;
+      backdrop-filter: blur(4px);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 26px;
+      letter-spacing: -0.5px;
+    }
+
+    p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .bank {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 16px;
+    }
+
+    .bank-label {
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .money {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px 16px;
+      margin-top: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #0b1020;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.12s ease, background 0.2s ease;
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .secondary {
+      background: linear-gradient(135deg, #34d399, #22c55e);
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.3);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .progress {
+      margin-top: 12px;
+      height: 8px;
+      width: 100%;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #8b5cf6, #22c55e);
+      background-size: 200% 200%;
+      animation: flow 3s ease infinite;
+      transition: width 0.25s ease;
+    }
+
+    .ripple {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.6);
+      pointer-events: none;
+      animation: ripple 0.5s ease-out forwards;
+    }
+
+    .float-text {
+      position: absolute;
+      color: #fbbf24;
+      font-weight: 700;
+      text-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+      animation: floatUp 0.9s ease-out forwards;
+      pointer-events: none;
+    }
+
+    .money.bump {
+      animation: pop 0.18s ease;
+    }
+
+    .secondary.unlock {
+      animation: unlockGlow 1.4s ease-out forwards;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 10px 12px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    .goal {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .shop {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(22, 34, 53, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .shop h2,
+    .achievements h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .shop-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      margin-bottom: 10px;
+    }
+
+    .shop-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .shop-item button {
+      width: auto;
+      margin: 0;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .shop-item button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .achievements {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .achievement-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .achievement {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.03);
+      font-size: 13px;
+    }
+
+    .achievement.completed {
+      border-color: rgba(34, 197, 94, 0.4);
+      background: rgba(34, 197, 94, 0.12);
+      color: #bbf7d0;
+    }
+
+    .event-banner {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      background: rgba(251, 191, 36, 0.12);
+      color: #fde68a;
+      font-size: 14px;
+      display: none;
+    }
+
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 16px;
+      opacity: 0.9;
+      transform: translate(-50%, -50%);
+      animation: confettiFall 900ms ease-out forwards;
+      pointer-events: none;
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fef3c7 0%, rgba(251, 191, 36, 0) 70%);
+      opacity: 0.9;
+      transform: translate(-50%, -50%);
+      animation: sparkle 600ms ease-out forwards;
+      pointer-events: none;
+    }
+
+    .meteor {
+      position: absolute;
+      width: 140px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(251, 191, 36, 0), rgba(251, 191, 36, 0.8), rgba(251, 191, 36, 0));
+      transform: rotate(-12deg);
+      animation: meteor 800ms ease-out forwards;
+      pointer-events: none;
+    }
+
+    .screen-flash {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.22), transparent 60%);
+      opacity: 0;
+      animation: flash 420ms ease-out forwards;
+      pointer-events: none;
+      border-radius: 18px;
+    }
+
+    .coin-rain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    .coin {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      top: -40px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fef9c3 0%, #facc15 35%, #f59e0b 70%, #b45309 100%);
+      box-shadow: 0 0 12px rgba(250, 204, 21, 0.6);
+      animation: coinFall 2.4s linear forwards, coinSpin 0.9s linear infinite;
+      opacity: 0.95;
+    }
+
+    .meme-video {
+      position: fixed;
+      width: clamp(160px, 22vw, 280px);
+      aspect-ratio: 16 / 9;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 16px 30px rgba(0, 0, 0, 0.4);
+      background: #0b1020;
+      z-index: 20;
+      pointer-events: none;
+      animation: pop 0.2s ease;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: translateY(0); box-shadow: 0 10px 24px rgba(124, 58, 237, 0.35); }
+      50% { transform: translateY(-1px); box-shadow: 0 12px 30px rgba(124, 58, 237, 0.45); }
+    }
+
+    @keyframes ripple {
+      from { width: 0; height: 0; opacity: 0.4; }
+      to { width: 280px; height: 280px; opacity: 0; }
+    }
+
+    @keyframes floatUp {
+      from { opacity: 1; transform: translate(-50%, 0) scale(1); }
+      to { opacity: 0; transform: translate(-50%, -32px) scale(1.05); }
+    }
+
+    @keyframes pop {
+      from { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      to { transform: scale(1); }
+    }
+
+    @keyframes unlockGlow {
+      0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+      70% { box-shadow: 0 0 0 18px rgba(34, 197, 94, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+
+    @keyframes flow {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    @keyframes confettiFall {
+      from { transform: translate(-50%, -50%) rotate(0deg); opacity: 1; }
+      to { transform: translate(-50%, 90px) rotate(220deg); opacity: 0; }
+    }
+
+    @keyframes sparkle {
+      from { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      to { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+    }
+
+    @keyframes meteor {
+      from { transform: translateX(-120px) translateY(-40px) rotate(-12deg); opacity: 0; }
+      30% { opacity: 1; }
+      to { transform: translateX(240px) translateY(60px) rotate(-12deg); opacity: 0; }
+    }
+
+    @keyframes flash {
+      from { opacity: 0; }
+      20% { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    @keyframes coinFall {
+      from { top: -40px; opacity: 0; }
+      10% { opacity: 1; }
+      to { top: 110vh; opacity: 0; }
+    }
+
+    @keyframes coinSpin {
+      from { transform: rotateY(0deg); }
+      to { transform: rotateY(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Click Builder</h1>
+    <p>點擊按鈕累積金錢。先從 $1/次開始，累積到 50 後會解鎖 $10/次的按鈕。</p>
+
+    <div class="bank">
+      <div class="bank-label">金錢</div>
+      <div class="money" id="money">$0</div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">連點</div>
+        <div id="combo-count" class="stat-value">x1</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">倍率</div>
+        <div id="multiplier" class="stat-value">1.0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">自動</div>
+        <div id="auto-rate" class="stat-value">0/s</div>
+      </div>
+    </div>
+
+    <button id="btn-1" class="primary">+ $1</button>
+    <button id="btn-10" class="secondary hidden">+ $10</button>
+
+    <div class="progress" aria-hidden="true">
+      <div id="progress-fill" class="progress-fill"></div>
+    </div>
+
+    <div id="goal" class="goal">下一個目標：累積 $50 解鎖 +$10 按鈕。</div>
+    <div id="event-banner" class="event-banner">限時雙倍！10 秒內點擊收益 x2</div>
+
+    <div class="shop">
+      <h2>升級商店</h2>
+      <div class="shop-item">
+        <div>
+          <div>自動點擊器</div>
+          <div class="bank-label">每秒 +1，價格 $80</div>
+        </div>
+        <button id="buy-auto" class="secondary">購買</button>
+      </div>
+      <div class="shop-item">
+        <div>
+          <div>點擊加成</div>
+          <div class="bank-label">每次點擊 +1，價格 $120</div>
+        </div>
+        <button id="buy-boost" class="secondary">購買</button>
+      </div>
+    </div>
+
+    <div class="achievements">
+      <h2>成就</h2>
+      <div class="achievement-list">
+        <div id="ach-10" class="achievement">連點 10 次</div>
+        <div id="ach-100" class="achievement">累積 $100</div>
+        <div id="ach-auto" class="achievement">啟用自動點擊器</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const moneyDisplay = document.getElementById("money");
+    const addOneBtn = document.getElementById("btn-1");
+    const addTenBtn = document.getElementById("btn-10");
+    const progressFill = document.getElementById("progress-fill");
+    const card = document.querySelector(".card");
+    const comboCountEl = document.getElementById("combo-count");
+    const multiplierEl = document.getElementById("multiplier");
+    const autoRateEl = document.getElementById("auto-rate");
+    const goalEl = document.getElementById("goal");
+    const eventBanner = document.getElementById("event-banner");
+    const buyAutoBtn = document.getElementById("buy-auto");
+    const buyBoostBtn = document.getElementById("buy-boost");
+    const ach10 = document.getElementById("ach-10");
+    const ach100 = document.getElementById("ach-100");
+    const achAuto = document.getElementById("ach-auto");
+
+    let money = 0;
+    const unlockTarget = 50;
+    let combo = 0;
+    let baseClick = 1;
+    let autoClickers = 0;
+    let comboTimer = null;
+    let multiplier = 1;
+    let eventMultiplier = 1;
+    let eventTimer = null;
+    let surpriseLock = false;
+    let coinRainLock = false;
+    let videoClickCount = 0;
+    const videoTriggerCount = 50;
+    let videoPlaying = false;
+    const coinRainTrigger = 200;
+    let lastCoinRain = 0;
+    let totalEarned = 0;
+
+    const memeVideos = [
+      "assets/video/#影片素材 005  黑人歡呼 ohhhhhhhhh~~.mp4",
+      "assets/video/#影片素材 006 統神端火鍋（明明是墨西哥粽）.mp4",
+      "assets/video/#影片素材 008 nice.mp4",
+      "assets/video/#影片素材 014 王世堅精華#1 【就是那麼簡單】.mp4",
+      "assets/video/#影片素材 027 咻!蹦機勒按呢金大聲拉.mp4",
+      "assets/video/#影片素材 030 賺爛了賺爛了.mp4",
+      "assets/video/Green Screen Spinning Cat Meme | OIIAIOIIIAI Meme.mp4",
+      "assets/video/wow.webm"
+    ];
+
+    function bumpMoney() {
+      moneyDisplay.classList.add("bump");
+      setTimeout(() => moneyDisplay.classList.remove("bump"), 180);
+    }
+
+    function spawnFloat(amount) {
+      const bubble = document.createElement("span");
+      bubble.className = "float-text";
+      bubble.textContent = `+ $${amount}`;
+      bubble.style.left = `${42 + Math.random() * 16}%`;
+      bubble.style.top = `${36 + Math.random() * 20}%`;
+      card.appendChild(bubble);
+      setTimeout(() => bubble.remove(), 900);
+    }
+
+    function addRipple(event, target) {
+      const rect = target.getBoundingClientRect();
+      const ripple = document.createElement("span");
+      ripple.className = "ripple";
+      ripple.style.left = `${event.clientX - rect.left}px`;
+      ripple.style.top = `${event.clientY - rect.top}px`;
+      target.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 500);
+    }
+
+    function spawnConfetti() {
+      const colors = ["#f59e0b", "#22c55e", "#8b5cf6", "#38bdf8", "#f472b6"];
+      for (let i = 0; i < 8; i += 1) {
+        const piece = document.createElement("span");
+        piece.className = "confetti";
+        piece.style.left = `${30 + Math.random() * 40}%`;
+        piece.style.top = `${22 + Math.random() * 20}%`;
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 200}deg)`;
+        card.appendChild(piece);
+        setTimeout(() => piece.remove(), 900);
+      }
+    }
+
+    function spawnSparkle() {
+      const sparkle = document.createElement("span");
+      sparkle.className = "sparkle";
+      sparkle.style.left = `${32 + Math.random() * 36}%`;
+      sparkle.style.top = `${28 + Math.random() * 28}%`;
+      card.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 600);
+    }
+
+    function spawnMeteor() {
+      const meteor = document.createElement("span");
+      meteor.className = "meteor";
+      meteor.style.left = `${10 + Math.random() * 40}%`;
+      meteor.style.top = `${8 + Math.random() * 18}%`;
+      card.appendChild(meteor);
+      setTimeout(() => meteor.remove(), 800);
+    }
+
+    function flashCard() {
+      const flash = document.createElement("span");
+      flash.className = "screen-flash";
+      card.appendChild(flash);
+      setTimeout(() => flash.remove(), 420);
+    }
+
+    function triggerCoinRain(durationMs = 5000) {
+      if (coinRainLock) return;
+      coinRainLock = true;
+      const layer = document.createElement("div");
+      layer.className = "coin-rain";
+      document.body.appendChild(layer);
+      const spawnInterval = setInterval(() => {
+        const coin = document.createElement("span");
+        coin.className = "coin";
+        coin.style.left = `${Math.random() * 100}%`;
+        coin.style.animationDuration = `${2 + Math.random() * 1.2}s, 0.7s`;
+        layer.appendChild(coin);
+        setTimeout(() => coin.remove(), 2600);
+      }, 120);
+      setTimeout(() => {
+        clearInterval(spawnInterval);
+        setTimeout(() => {
+          layer.remove();
+          coinRainLock = false;
+        }, 2600);
+      }, durationMs);
+    }
+
+    function updateBackgroundIntensity() {
+      const intensity = Math.min(combo / 20, 1);
+      const glow = 0.12 + intensity * 0.18;
+      document.body.style.background = `
+        radial-gradient(circle at 20% 20%, rgba(124, 58, 237, ${glow}), transparent 30%),
+        radial-gradient(circle at 80% 0%, rgba(34, 197, 94, ${glow}), transparent 35%),
+        var(--bg)
+      `;
+    }
+
+    function updateCombo() {
+      combo += 1;
+      if (combo >= 10) {
+        multiplier = 1 + Math.min((combo - 9) * 0.05, 1);
+      } else {
+        multiplier = 1;
+      }
+      comboCountEl.textContent = `x${combo}`;
+      multiplierEl.textContent = multiplier.toFixed(2);
+      updateBackgroundIntensity();
+      clearTimeout(comboTimer);
+      comboTimer = setTimeout(() => {
+        combo = 0;
+        multiplier = 1;
+        comboCountEl.textContent = "x0";
+        multiplierEl.textContent = "1.00";
+        updateBackgroundIntensity();
+      }, 1200);
+    }
+
+    function maybeTriggerEvent() {
+      if (eventTimer) return;
+      if (Math.random() < 0.06) {
+        eventMultiplier = 2;
+        eventBanner.style.display = "block";
+        eventTimer = setTimeout(() => {
+          eventMultiplier = 1;
+          eventBanner.style.display = "none";
+          eventTimer = null;
+        }, 10000);
+      }
+    }
+
+    function maybeTriggerSurprise() {
+      if (surpriseLock) return;
+      const roll = Math.random();
+      if (roll < 0.04) {
+        surpriseLock = true;
+        spawnConfetti();
+        flashCard();
+        setTimeout(() => {
+          surpriseLock = false;
+        }, 1200);
+      } else if (roll < 0.08) {
+        spawnMeteor();
+      } else if (roll < 0.16) {
+        spawnSparkle();
+      }
+    }
+
+    function updateAchievements() {
+      if (combo >= 10) ach10.classList.add("completed");
+      if (money >= 100) ach100.classList.add("completed");
+      if (autoClickers > 0) achAuto.classList.add("completed");
+    }
+
+    function triggerRandomVideo() {
+      if (videoPlaying || memeVideos.length === 0) return;
+      videoPlaying = true;
+      const video = document.createElement("video");
+      video.className = "meme-video";
+      const videoWidth = Math.min(Math.max(window.innerWidth * 0.22, 160), 280);
+      const videoHeight = videoWidth * 0.5625;
+      const maxLeft = Math.max(window.innerWidth - videoWidth - 24, 12);
+      const maxTop = Math.max(window.innerHeight - videoHeight - 24, 12);
+      video.style.left = `${Math.random() * maxLeft + 12}px`;
+      video.style.top = `${Math.random() * maxTop + 12}px`;
+      const source = memeVideos[Math.floor(Math.random() * memeVideos.length)];
+      video.src = source.split("/").map(encodeURIComponent).join("/");
+      video.playsInline = true;
+      video.autoplay = true;
+      video.muted = false;
+      video.addEventListener("ended", () => {
+        video.remove();
+        videoPlaying = false;
+      });
+      video.addEventListener("error", () => {
+        video.remove();
+        videoPlaying = false;
+      });
+      document.body.appendChild(video);
+      const playPromise = video.play();
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => {
+          video.remove();
+          videoPlaying = false;
+        });
+      }
+    }
+
+    function maybeTriggerVideo() {
+      videoClickCount += 1;
+      if (videoClickCount < videoTriggerCount) return;
+      videoClickCount = 0;
+      if (videoPlaying) return;
+      triggerRandomVideo();
+    }
+
+    function maybeTriggerCoinRain() {
+      if (totalEarned - lastCoinRain < coinRainTrigger) return;
+      lastCoinRain = totalEarned;
+      triggerCoinRain(5000);
+    }
+
+    function updateUI() {
+      moneyDisplay.textContent = `$${money}`;
+      const progress = Math.min((money / unlockTarget) * 100, 100);
+      progressFill.style.width = `${progress}%`;
+      if (money >= unlockTarget) {
+        addTenBtn.classList.remove("hidden");
+        addTenBtn.classList.add("unlock");
+        progressFill.style.background = "linear-gradient(90deg, #22c55e, #22c55e)";
+        goalEl.textContent = "下一個目標：累積 $100 解鎖成就與商店升級。";
+      }
+      buyAutoBtn.disabled = money < 80;
+      buyBoostBtn.disabled = money < 120;
+      autoRateEl.textContent = `${autoClickers}/s`;
+      updateAchievements();
+    }
+
+    function handleClick(value, event, target) {
+      const gain = Math.round(value * multiplier * eventMultiplier);
+      money += gain;
+      totalEarned += gain;
+      maybeTriggerVideo();
+      maybeTriggerCoinRain();
+      updateUI();
+      addRipple(event, target);
+      spawnFloat(gain);
+      bumpMoney();
+      updateCombo();
+      maybeTriggerEvent();
+      maybeTriggerSurprise();
+    }
+
+    addOneBtn.addEventListener("click", (event) => {
+      handleClick(baseClick, event, addOneBtn);
+    });
+
+    addTenBtn.addEventListener("click", (event) => {
+      handleClick(10 + baseClick - 1, event, addTenBtn);
+    });
+
+    buyAutoBtn.addEventListener("click", () => {
+      if (money < 80) return;
+      money -= 80;
+      autoClickers += 1;
+      updateUI();
+    });
+
+    buyBoostBtn.addEventListener("click", () => {
+      if (money < 120) return;
+      money -= 120;
+      baseClick += 1;
+      updateUI();
+    });
+
+    setInterval(() => {
+      if (autoClickers === 0) return;
+      const gain = autoClickers * eventMultiplier;
+      money += gain;
+      totalEarned += gain;
+      updateUI();
+      spawnFloat(gain);
+      bumpMoney();
+      maybeTriggerSurprise();
+      maybeTriggerCoinRain();
+    }, 1000);
+
+    updateUI();
+  </script>
+</body>
+</html>
